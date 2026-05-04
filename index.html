@@ -44,25 +44,21 @@
 
   .wrap { width:100%; max-width:460px; position:relative; z-index:1; }
 
-  /* HEADER */
   .header { text-align:center; margin-bottom:28px; padding-top:10px; }
   .logo {
     width:64px; height:64px; border-radius:16px;
     background: linear-gradient(135deg, #1d4ed8, #0891b2);
     display:flex; align-items:center; justify-content:center;
-    margin:0 auto 14px;
-    font-size:28px;
+    margin:0 auto 14px; font-size:28px;
     box-shadow: 0 0 40px rgba(37,99,235,0.35);
   }
   .header h1 { font-size:18px; font-weight:900; color:var(--text); }
   .header p  { font-size:12px; color:var(--text-muted); margin-top:3px; }
 
-  /* CLOCK */
   .clock-box { text-align:center; margin-bottom:22px; }
   .clock { font-size:42px; font-weight:900; letter-spacing:4px; font-variant-numeric:tabular-nums; }
   .date  { font-size:13px; color:var(--text-muted); margin-top:2px; }
 
-  /* CARD */
   .card {
     background:var(--surface);
     border:1px solid var(--border);
@@ -81,7 +77,6 @@
     background:var(--accent); border-radius:2px;
   }
 
-  /* BLOCKED SCREEN */
   .blocked {
     background: linear-gradient(135deg, #1a0a0a, #2d0f0f);
     border: 1px solid #7f1d1d;
@@ -93,13 +88,24 @@
   .blocked-icon { font-size:48px; margin-bottom:12px; }
   .blocked h2 { font-size:18px; font-weight:900; color:#fca5a5; margin-bottom:8px; }
   .blocked p  { font-size:13px; color:#f87171; line-height:1.7; }
-  .blocked .contact { 
+  .blocked .contact {
     margin-top:16px; padding:12px;
     background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3);
     border-radius:10px; font-size:13px; font-weight:700; color:#fca5a5;
   }
 
-  /* SELECT */
+  .pending {
+    background: linear-gradient(135deg, #1a1500, #2d2200);
+    border: 1px solid #92400e;
+    border-radius:18px;
+    padding:32px 22px;
+    text-align:center;
+    margin-bottom:14px;
+  }
+  .pending-icon { font-size:48px; margin-bottom:12px; }
+  .pending h2 { font-size:18px; font-weight:900; color:#fde68a; margin-bottom:8px; }
+  .pending p  { font-size:13px; color:#fcd34d; line-height:1.7; }
+
   .select-wrap { position:relative; }
   select {
     width:100%; padding:13px 16px;
@@ -115,7 +121,6 @@
     transform:translateY(-50%); color:var(--text-muted); pointer-events:none;
   }
 
-  /* JOBS */
   .jobs-grid {
     display:grid; grid-template-columns:1fr 1fr;
     gap:8px; margin-top:4px;
@@ -135,7 +140,6 @@
   .job-btn.selected::before { content:'✓ '; }
   .jobs-note { font-size:11px; color:var(--text-muted); margin-top:8px; text-align:center; }
 
-  /* LOCATION */
   .loc-bar {
     display:flex; align-items:center; gap:10px;
     background:var(--surface2); border:1px solid var(--border);
@@ -148,7 +152,6 @@
   .loc-bar.warn .dot { background:var(--accent-warn); }
   .loc-text { font-size:12px; color:var(--text-muted); }
 
-  /* BUTTONS */
   .btn-row { display:flex; gap:10px; }
   .btn {
     flex:1; padding:16px; border:none; border-radius:13px;
@@ -163,6 +166,10 @@
     width:100%; margin-bottom:10px;
     background:linear-gradient(135deg,#1d4ed8,#0891b2);
     color:#fff; box-shadow:0 4px 20px rgba(37,99,235,0.3);
+    border:none; border-radius:13px;
+    font-family:'Cairo',sans-serif; font-size:15px; font-weight:700;
+    padding:13px; cursor:pointer;
+    transition: box-shadow .2s, transform .15s;
   }
   .btn-loc:hover { box-shadow:0 6px 28px rgba(37,99,235,0.5); transform:translateY(-1px); }
 
@@ -171,7 +178,6 @@
   .btn-in:not(:disabled):hover  { box-shadow:0 6px 28px rgba(16,185,129,0.5); transform:translateY(-2px); }
   .btn-out:not(:disabled):hover { box-shadow:0 6px 28px rgba(239,68,68,0.5);  transform:translateY(-2px); }
 
-  /* HISTORY */
   .hist-list { max-height:130px; overflow-y:auto; }
   .hist-item {
     display:flex; justify-content:space-between; align-items:center;
@@ -179,22 +185,19 @@
     font-size:12px; gap:6px; flex-wrap:wrap;
   }
   .hist-item:last-child { border-bottom:none; }
-  .badge {
-    padding:2px 9px; border-radius:20px; font-size:11px; font-weight:700;
-  }
+  .badge { padding:2px 9px; border-radius:20px; font-size:11px; font-weight:700; }
   .badge-in  { background:rgba(16,185,129,.15); color:#34d399; border:1px solid #10b981; }
   .badge-out { background:rgba(239,68,68,.15);  color:#f87171; border:1px solid #ef4444; }
   .empty { text-align:center; color:var(--text-muted); padding:18px; font-size:12px; }
 
-  /* SPINNER */
   .spinner {
     display:inline-block; width:16px; height:16px;
     border:3px solid rgba(255,255,255,.2); border-top-color:#fff;
-    border-radius:50%; animation:spin .7s linear infinite; vertical-align:middle; margin-left:6px;
+    border-radius:50%; animation:spin .7s linear infinite;
+    vertical-align:middle; margin-left:6px;
   }
   @keyframes spin { to { transform:rotate(360deg); } }
 
-  /* TOAST */
   .toast {
     position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(100px);
     background:var(--surface); border:1px solid var(--border); border-radius:14px;
@@ -226,18 +229,24 @@
     <div class="date"  id="dateStr">—</div>
   </div>
 
-  <!-- BLOCKED SCREEN — مخفي في الأول -->
+  <!-- شاشة جهاز مرفوض -->
   <div class="blocked" id="blockedScreen" style="display:none;">
     <div class="blocked-icon">🚫</div>
     <h2>جهاز غير معرّف</h2>
-    <p>هذا الجهاز غير مسجّل في النظام ولا يملك صلاحية تسجيل الحضور.</p>
+    <p>هذا الجهاز غير مسجّل في النظام<br>ولا يملك صلاحية تسجيل الحضور.</p>
     <div class="contact">📞 تواصل مع بشمهندس نورالدين لتفعيل جهازك</div>
   </div>
 
-  <!-- MAIN CONTENT -->
+  <!-- شاشة جهاز في الانتظار -->
+  <div class="pending" id="pendingScreen" style="display:none;">
+    <div class="pending-icon">⏳</div>
+    <h2>جهازك قيد المراجعة</h2>
+    <p>تم إرسال طلب تفعيل جهازك للإدارة.<br>انتظر حتى يتم الموافقة عليه.</p>
+  </div>
+
+  <!-- المحتوى الرئيسي -->
   <div id="mainContent">
 
-    <!-- الموظف -->
     <div class="card">
       <div class="card-title">بيانات الموظف</div>
       <div class="select-wrap">
@@ -266,10 +275,9 @@
       </div>
     </div>
 
-    <!-- الوظيفة -->
     <div class="card">
       <div class="card-title">الوظيفة اليوم (اختر واحدة أو أكثر)</div>
-      <div class="jobs-grid" id="jobsGrid">
+      <div class="jobs-grid">
         <button class="job-btn" onclick="toggleJob(this)">ريسبشن</button>
         <button class="job-btn" onclick="toggleJob(this)">سحب عينات</button>
         <button class="job-btn" onclick="toggleJob(this)">صور الدم</button>
@@ -281,17 +289,15 @@
       <div class="jobs-note" id="jobsNote">لم يتم اختيار وظيفة بعد</div>
     </div>
 
-    <!-- الموقع -->
     <div class="card">
       <div class="card-title">الموقع الجغرافي</div>
       <div class="loc-bar" id="locBar">
         <div class="dot"></div>
         <div class="loc-text" id="locText">اضغط لتحديد موقعك</div>
       </div>
-      <button class="btn btn-loc" onclick="getLocation()">📍 تحديد الموقع</button>
+      <button class="btn-loc" onclick="getLocation()">📍 تحديد الموقع</button>
     </div>
 
-    <!-- تسجيل -->
     <div class="card">
       <div class="card-title">تسجيل الحضور / الانصراف</div>
       <div class="btn-row">
@@ -300,14 +306,15 @@
       </div>
     </div>
 
-    <!-- سجل اليوم -->
     <div class="card">
       <div class="card-title">سجل اليوم</div>
-      <div class="hist-list" id="histList"><div class="empty">لا توجد سجلات بعد</div></div>
+      <div class="hist-list" id="histList">
+        <div class="empty">لا توجد سجلات بعد</div>
+      </div>
     </div>
 
-  </div><!-- /mainContent -->
-</div><!-- /wrap -->
+  </div>
+</div>
 
 <div class="toast" id="toast">
   <span id="toastIcon"></span>
@@ -319,43 +326,38 @@
    ⚙️ إعدادات — عدّل هنا بس
    ============================================================ */
 const CONFIG = {
-  APPS_SCRIPT_URL: "https://script.google.com/macros/s/AKfycbzmHR1E8Jkymh-f28byTCymEQ3qRxOvzwOzfUlj_8ZLvqATYr13i2VCdQpOXqQ1V4WN/exec",
+  APPS_SCRIPT_URL: "https://script.google.com/macros/s/AKfycbx-feaGWghwtP8A_4YlzpKjtwh8ehY0EtO4XXD5z7Y9VT9j6qpaJy5M9EEZFoXUFtVB/exec",
   LAB_LAT: 30.8538325,
   LAB_LON: 32.307204,
-  GEOFENCE_RADIUS: 9999999, // ✏️ غيّرها لـ 150 لما تروح المعمل
-  SECRET_KEY: "LAB_IHAB_2026_SECRET", // ✏️ غيّر الكلمة دي لكلمة سر خاصة بيك
+  GEOFENCE_RADIUS: 9999999,
 };
 /* ============================================================ */
 
 let uuid = "", lat = null, lon = null, locationOK = false;
 let selectedJobs = [];
 
-// -------- INIT --------
 window.onload = () => {
   startClock();
   initDevice();
   loadHistory();
 };
 
-// -------- CLOCK --------
 function startClock() {
   const tick = () => {
     const n = new Date();
-    document.getElementById("clock").textContent = n.toLocaleTimeString("ar-EG", { hour12:false });
-    document.getElementById("dateStr").textContent = n.toLocaleDateString("ar-EG", { weekday:"long", year:"numeric", month:"long", day:"numeric" });
+    document.getElementById("clock").textContent = n.toLocaleTimeString("ar-EG", {hour12:false});
+    document.getElementById("dateStr").textContent = n.toLocaleDateString("ar-EG", {weekday:"long",year:"numeric",month:"long",day:"numeric"});
   };
   tick(); setInterval(tick, 1000);
 }
 
-// -------- DEVICE --------
 function initDevice() {
   let stored = localStorage.getItem("att_uuid");
   if (!stored) {
-    stored = crypto.randomUUID ? crypto.randomUUID() : generateUUID();
+    stored = (crypto.randomUUID ? crypto.randomUUID() : generateUUID());
     localStorage.setItem("att_uuid", stored);
   }
   uuid = stored;
-  // بصمة الجهاز مش بتتعرض للموظف
 }
 
 function generateUUID() {
@@ -365,19 +367,6 @@ function generateUUID() {
   });
 }
 
-// -------- SIMPLE HASH (Security) --------
-function hashPayload(data) {
-  const str = JSON.stringify(data) + CONFIG.SECRET_KEY;
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    const c = str.charCodeAt(i);
-    hash = ((hash << 5) - hash) + c;
-    hash |= 0;
-  }
-  return Math.abs(hash).toString(16);
-}
-
-// -------- JOBS --------
 function toggleJob(btn) {
   btn.classList.toggle("selected");
   selectedJobs = [...document.querySelectorAll(".job-btn.selected")].map(b => b.textContent.replace("✓ ",""));
@@ -385,7 +374,6 @@ function toggleJob(btn) {
   note.textContent = selectedJobs.length ? "✅ " + selectedJobs.join(" + ") : "لم يتم اختيار وظيفة بعد";
 }
 
-// -------- GPS --------
 function getLocation() {
   const bar = document.getElementById("locBar");
   const txt = document.getElementById("locText");
@@ -399,7 +387,6 @@ function getLocation() {
     lon = pos.coords.longitude;
     const acc = pos.coords.accuracy;
 
-    // Anti-Mock: لو الدقة أكبر من 500 متر ممكن يكون Fake GPS
     if (acc > 500) {
       bar.className = "loc-bar fail";
       txt.textContent = "⚠️ موقع غير موثوق — دقة ضعيفة جداً";
@@ -425,7 +412,7 @@ function getLocation() {
     bar.className = "loc-bar fail";
     txt.textContent = "فشل تحديد الموقع — تأكد من إذن GPS";
     showToast("فشل تحديد الموقع", "error");
-  }, { enableHighAccuracy:true, timeout:10000 });
+  }, {enableHighAccuracy:true, timeout:10000});
 }
 
 function haversine(la1,lo1,la2,lo2) {
@@ -439,11 +426,10 @@ function enableBtns(v) {
   document.getElementById("btnOut").disabled = !v;
 }
 
-// -------- SUBMIT --------
 async function submit(type) {
   const name = document.getElementById("empSelect").value.trim();
-  if (!name)          { showToast("اختار اسمك أولاً", "warning"); return; }
-  if (!locationOK)    { showToast("حدد موقعك أولاً", "warning"); return; }
+  if (!name)             { showToast("اختار اسمك أولاً", "warning"); return; }
+  if (!locationOK)       { showToast("حدد موقعك أولاً", "warning"); return; }
   if (!selectedJobs.length) { showToast("اختار وظيفتك اليوم", "warning"); return; }
 
   const btnId = type==="حضور"?"btnIn":"btnOut";
@@ -458,18 +444,15 @@ async function submit(type) {
     timestamp: new Date().toISOString(),
   };
 
-  // إضافة hash للأمان
-  payload.hash = hashPayload({ name, type, uuid, jobs: payload.jobs });
-
   try {
     await fetch(CONFIG.APPS_SCRIPT_URL, {
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
       body: JSON.stringify(payload),
-      mode:"no-cors",
+      mode: "no-cors",
     });
     showToast(`تم تسجيل ${type} ✅`, "success");
-    addHistory(name, type, selectedJobs.join("+"), new Date());
+    addHistory(name, type, selectedJobs.join(" + "), new Date());
   } catch(e) {
     showToast("خطأ في الإرسال", "error");
   } finally {
@@ -478,18 +461,19 @@ async function submit(type) {
   }
 }
 
-// -------- HISTORY --------
 function addHistory(name, type, jobs, d) {
   const k = "att_hist_" + new Date().toDateString();
   const h = JSON.parse(localStorage.getItem(k)||"[]");
-  h.unshift({ name, type, jobs, time: d.toLocaleTimeString("ar-EG",{hour12:false}) });
+  h.unshift({name, type, jobs, time: d.toLocaleTimeString("ar-EG",{hour12:false})});
   localStorage.setItem(k, JSON.stringify(h.slice(0,20)));
   renderHistory(h);
 }
+
 function loadHistory() {
   const k = "att_hist_" + new Date().toDateString();
   renderHistory(JSON.parse(localStorage.getItem(k)||"[]"));
 }
+
 function renderHistory(h) {
   const el = document.getElementById("histList");
   if (!h.length) { el.innerHTML='<div class="empty">لا توجد سجلات اليوم</div>'; return; }
@@ -502,7 +486,6 @@ function renderHistory(h) {
     </div>`).join("");
 }
 
-// -------- TOAST --------
 let tt;
 function showToast(msg, type="success") {
   const icons={success:"✅",error:"❌",warning:"⚠️"};
