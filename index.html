@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -13,204 +12,189 @@
     --surface2: #162035;
     --border: #1e2d4a;
     --accent: #2563eb;
-    --accent-in: #10b981;
-    --accent-out: #ef4444;
-    --accent-warn: #f59e0b;
+    --green: #10b981;
+    --red: #ef4444;
+    --yellow: #f59e0b;
     --text: #e2e8f0;
-    --text-muted: #64748b;
-    --glow: rgba(37,99,235,0.12);
+    --muted: #64748b;
   }
   * { margin:0; padding:0; box-sizing:border-box; }
 
   body {
-    font-family: 'Cairo', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    padding: 20px 16px 40px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    font-family:'Cairo',sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    min-height:100vh;
+    padding:20px 16px 40px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
   }
 
   body::before {
-    content:'';
-    position:fixed;
-    inset:0;
-    background: radial-gradient(ellipse at 20% 0%, rgba(37,99,235,0.06) 0%, transparent 60%),
-                radial-gradient(ellipse at 80% 100%, rgba(16,185,129,0.04) 0%, transparent 60%);
-    pointer-events:none;
-    z-index:0;
+    content:''; position:fixed; inset:0;
+    background:radial-gradient(ellipse at 20% 0%,rgba(37,99,235,.06) 0%,transparent 60%),
+               radial-gradient(ellipse at 80% 100%,rgba(16,185,129,.04) 0%,transparent 60%);
+    pointer-events:none; z-index:0;
   }
 
   .wrap { width:100%; max-width:460px; position:relative; z-index:1; }
 
-  .header { text-align:center; margin-bottom:28px; padding-top:10px; }
+  /* HEADER */
+  .header { text-align:center; margin-bottom:24px; padding-top:8px; }
   .logo {
     width:64px; height:64px; border-radius:16px;
-    background: linear-gradient(135deg, #1d4ed8, #0891b2);
+    background:linear-gradient(135deg,#1d4ed8,#0891b2);
     display:flex; align-items:center; justify-content:center;
-    margin:0 auto 14px; font-size:28px;
-    box-shadow: 0 0 40px rgba(37,99,235,0.35);
+    margin:0 auto 12px; font-size:28px;
+    box-shadow:0 0 40px rgba(37,99,235,.35);
   }
-  .header h1 { font-size:18px; font-weight:900; color:var(--text); }
-  .header p  { font-size:12px; color:var(--text-muted); margin-top:3px; }
+  .header h1 { font-size:18px; font-weight:900; }
+  .header p  { font-size:12px; color:var(--muted); margin-top:3px; }
 
-  .clock-box { text-align:center; margin-bottom:22px; }
-  .clock { font-size:42px; font-weight:900; letter-spacing:4px; font-variant-numeric:tabular-nums; }
-  .date  { font-size:13px; color:var(--text-muted); margin-top:2px; }
+  /* CLOCK */
+  .clock-box { text-align:center; margin-bottom:20px; }
+  .clock { font-size:40px; font-weight:900; letter-spacing:4px; font-variant-numeric:tabular-nums; }
+  .date  { font-size:12px; color:var(--muted); margin-top:2px; }
 
+  /* CARD */
   .card {
-    background:var(--surface);
-    border:1px solid var(--border);
-    border-radius:18px;
-    padding:22px;
-    margin-bottom:14px;
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:18px; padding:20px; margin-bottom:12px;
   }
   .card-title {
-    font-size:11px; font-weight:700; color:var(--text-muted);
+    font-size:11px; font-weight:700; color:var(--muted);
     text-transform:uppercase; letter-spacing:2px;
-    margin-bottom:14px;
-    display:flex; align-items:center; gap:8px;
+    margin-bottom:12px; display:flex; align-items:center; gap:8px;
   }
-  .card-title::before {
-    content:''; width:3px; height:13px;
-    background:var(--accent); border-radius:2px;
+  .card-title::before { content:''; width:3px; height:13px; background:var(--accent); border-radius:2px; }
+
+  /* ALERT SCREENS */
+  .alert-screen {
+    border-radius:18px; padding:30px 20px;
+    text-align:center; margin-bottom:12px; display:none;
+  }
+  .alert-screen .icon { font-size:50px; margin-bottom:14px; }
+  .alert-screen h2 { font-size:19px; font-weight:900; margin-bottom:10px; }
+  .alert-screen p  { font-size:13px; line-height:1.8; }
+  .alert-screen .contact {
+    margin-top:14px; padding:12px;
+    border-radius:10px; font-size:14px; font-weight:700;
   }
 
-  .blocked {
-    background: linear-gradient(135deg, #1a0a0a, #2d0f0f);
-    border: 1px solid #7f1d1d;
-    border-radius:18px;
-    padding:32px 22px;
-    text-align:center;
-    margin-bottom:14px;
+  .screen-blocked {
+    background:linear-gradient(135deg,#1a0a0a,#2d0f0f);
+    border:1px solid #7f1d1d;
   }
-  .blocked-icon { font-size:48px; margin-bottom:12px; }
-  .blocked h2 { font-size:18px; font-weight:900; color:#fca5a5; margin-bottom:8px; }
-  .blocked p  { font-size:13px; color:#f87171; line-height:1.7; }
-  .blocked .contact {
-    margin-top:16px; padding:12px;
-    background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3);
-    border-radius:10px; font-size:13px; font-weight:700; color:#fca5a5;
-  }
+  .screen-blocked h2 { color:#fca5a5; }
+  .screen-blocked p  { color:#f87171; }
+  .screen-blocked .contact { background:rgba(239,68,68,.1); border:1px solid rgba(239,68,68,.3); color:#fca5a5; }
 
-  .pending {
-    background: linear-gradient(135deg, #1a1500, #2d2200);
-    border: 1px solid #92400e;
-    border-radius:18px;
-    padding:32px 22px;
-    text-align:center;
-    margin-bottom:14px;
+  .screen-pending {
+    background:linear-gradient(135deg,#1a1500,#2d2200);
+    border:1px solid #92400e;
   }
-  .pending-icon { font-size:48px; margin-bottom:12px; }
-  .pending h2 { font-size:18px; font-weight:900; color:#fde68a; margin-bottom:8px; }
-  .pending p  { font-size:13px; color:#fcd34d; line-height:1.7; }
+  .screen-pending h2 { color:#fde68a; }
+  .screen-pending p  { color:#fcd34d; }
+  .screen-pending .contact { background:rgba(245,158,11,.1); border:1px solid rgba(245,158,11,.3); color:#fde68a; }
 
-  .select-wrap { position:relative; }
+  /* SELECT */
+  .sel-wrap { position:relative; }
   select {
     width:100%; padding:13px 16px;
     background:var(--surface2); border:1px solid var(--border);
     border-radius:12px; color:var(--text);
     font-family:'Cairo',sans-serif; font-size:15px; font-weight:600;
     appearance:none; cursor:pointer;
-    transition: border-color .2s, box-shadow .2s;
   }
-  select:focus { outline:none; border-color:var(--accent); box-shadow:0 0 0 3px var(--glow); }
-  .select-wrap::after {
-    content:'▾'; position:absolute; left:14px; top:50%;
-    transform:translateY(-50%); color:var(--text-muted); pointer-events:none;
-  }
+  select:focus { outline:none; border-color:var(--accent); }
+  .sel-wrap::after { content:'▾'; position:absolute; left:14px; top:50%; transform:translateY(-50%); color:var(--muted); pointer-events:none; }
 
-  .jobs-grid {
-    display:grid; grid-template-columns:1fr 1fr;
-    gap:8px; margin-top:4px;
-  }
+  /* JOBS */
+  .jobs-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
   .job-btn {
     padding:10px 8px; background:var(--surface2);
     border:1px solid var(--border); border-radius:10px;
-    color:var(--text-muted); font-family:'Cairo',sans-serif;
-    font-size:13px; font-weight:600; cursor:pointer;
-    transition: all .2s; text-align:center;
+    color:var(--muted); font-family:'Cairo',sans-serif;
+    font-size:13px; font-weight:600; cursor:pointer; transition:all .2s;
   }
   .job-btn:hover { border-color:var(--accent); color:var(--text); }
-  .job-btn.selected {
-    background: rgba(37,99,235,0.15);
-    border-color:var(--accent); color:#93c5fd;
-  }
-  .job-btn.selected::before { content:'✓ '; }
-  .jobs-note { font-size:11px; color:var(--text-muted); margin-top:8px; text-align:center; }
+  .job-btn.on { background:rgba(37,99,235,.15); border-color:var(--accent); color:#93c5fd; }
+  .job-btn.on::before { content:'✓ '; }
+  .jobs-note { font-size:11px; color:var(--muted); margin-top:8px; text-align:center; }
 
-  .loc-bar {
+  /* LOCATION */
+  .loc-row {
     display:flex; align-items:center; gap:10px;
     background:var(--surface2); border:1px solid var(--border);
-    border-radius:12px; padding:12px 14px; margin-bottom:10px;
-    min-height:46px;
+    border-radius:12px; padding:12px 14px; margin-bottom:10px; min-height:46px;
   }
-  .dot { width:9px; height:9px; border-radius:50%; background:var(--text-muted); flex-shrink:0; transition:background .3s; }
-  .loc-bar.ok   .dot { background:var(--accent-in);  box-shadow:0 0 8px var(--accent-in); }
-  .loc-bar.fail .dot { background:var(--accent-out); }
-  .loc-bar.warn .dot { background:var(--accent-warn); }
-  .loc-text { font-size:12px; color:var(--text-muted); }
+  .dot { width:9px; height:9px; border-radius:50%; background:var(--muted); flex-shrink:0; transition:background .3s; }
+  .loc-row.ok   .dot { background:var(--green); box-shadow:0 0 8px var(--green); }
+  .loc-row.fail .dot { background:var(--red); }
+  .loc-row.warn .dot { background:var(--yellow); }
+  .loc-txt { font-size:12px; color:var(--muted); }
 
-  .btn-row { display:flex; gap:10px; }
+  /* BUTTONS */
   .btn {
-    flex:1; padding:16px; border:none; border-radius:13px;
-    font-family:'Cairo',sans-serif; font-size:16px; font-weight:900;
-    cursor:pointer; transition:transform .15s, box-shadow .15s, opacity .2s;
-    position:relative; overflow:hidden;
+    border:none; border-radius:13px; cursor:pointer;
+    font-family:'Cairo',sans-serif; font-weight:900;
+    transition:transform .15s, box-shadow .15s, opacity .2s;
   }
-  .btn:disabled { opacity:.35; cursor:not-allowed; }
-  .btn:not(:disabled):active { transform:scale(0.97); }
+  .btn:disabled { opacity:.35; cursor:not-allowed; transform:none !important; }
+  .btn:not(:disabled):active { transform:scale(.97); }
 
   .btn-loc {
-    width:100%; margin-bottom:10px;
-    background:linear-gradient(135deg,#1d4ed8,#0891b2);
-    color:#fff; box-shadow:0 4px 20px rgba(37,99,235,0.3);
-    border:none; border-radius:13px;
-    font-family:'Cairo',sans-serif; font-size:15px; font-weight:700;
-    padding:13px; cursor:pointer;
-    transition: box-shadow .2s, transform .15s;
+    width:100%; padding:13px;
+    background:linear-gradient(135deg,#1d4ed8,#0891b2); color:#fff;
+    font-size:15px; box-shadow:0 4px 20px rgba(37,99,235,.3);
   }
-  .btn-loc:hover { box-shadow:0 6px 28px rgba(37,99,235,0.5); transform:translateY(-1px); }
+  .btn-loc:hover { box-shadow:0 6px 28px rgba(37,99,235,.5); transform:translateY(-1px); }
 
-  .btn-in  { background:linear-gradient(135deg,#10b981,#059669); color:#022c22; box-shadow:0 4px 20px rgba(16,185,129,0.3); }
-  .btn-out { background:linear-gradient(135deg,#ef4444,#b91c1c); color:#fff;    box-shadow:0 4px 20px rgba(239,68,68,0.3); }
-  .btn-in:not(:disabled):hover  { box-shadow:0 6px 28px rgba(16,185,129,0.5); transform:translateY(-2px); }
-  .btn-out:not(:disabled):hover { box-shadow:0 6px 28px rgba(239,68,68,0.5);  transform:translateY(-2px); }
+  .btn-row { display:flex; gap:10px; }
+  .btn-in  { flex:1; padding:16px; font-size:16px; background:linear-gradient(135deg,#10b981,#059669); color:#022c22; box-shadow:0 4px 20px rgba(16,185,129,.3); }
+  .btn-out { flex:1; padding:16px; font-size:16px; background:linear-gradient(135deg,#ef4444,#b91c1c); color:#fff; box-shadow:0 4px 20px rgba(239,68,68,.3); }
+  .btn-in:not(:disabled):hover  { box-shadow:0 6px 28px rgba(16,185,129,.5); transform:translateY(-2px); }
+  .btn-out:not(:disabled):hover { box-shadow:0 6px 28px rgba(239,68,68,.5);  transform:translateY(-2px); }
 
-  .hist-list { max-height:130px; overflow-y:auto; }
-  .hist-item {
+  /* HISTORY */
+  .hist { max-height:130px; overflow-y:auto; }
+  .hist-row {
     display:flex; justify-content:space-between; align-items:center;
     padding:8px 0; border-bottom:1px solid var(--border);
     font-size:12px; gap:6px; flex-wrap:wrap;
   }
-  .hist-item:last-child { border-bottom:none; }
+  .hist-row:last-child { border-bottom:none; }
   .badge { padding:2px 9px; border-radius:20px; font-size:11px; font-weight:700; }
-  .badge-in  { background:rgba(16,185,129,.15); color:#34d399; border:1px solid #10b981; }
-  .badge-out { background:rgba(239,68,68,.15);  color:#f87171; border:1px solid #ef4444; }
-  .empty { text-align:center; color:var(--text-muted); padding:18px; font-size:12px; }
+  .b-in  { background:rgba(16,185,129,.15); color:#34d399; border:1px solid #10b981; }
+  .b-out { background:rgba(239,68,68,.15);  color:#f87171; border:1px solid #ef4444; }
+  .empty { text-align:center; color:var(--muted); padding:18px; font-size:12px; }
 
-  .spinner {
-    display:inline-block; width:16px; height:16px;
+  /* SPINNER */
+  .spin {
+    display:inline-block; width:15px; height:15px;
     border:3px solid rgba(255,255,255,.2); border-top-color:#fff;
-    border-radius:50%; animation:spin .7s linear infinite;
-    vertical-align:middle; margin-left:6px;
+    border-radius:50%; animation:sp .7s linear infinite;
+    vertical-align:middle; margin-left:5px;
   }
-  @keyframes spin { to { transform:rotate(360deg); } }
+  @keyframes sp { to { transform:rotate(360deg); } }
 
+  /* TOAST */
   .toast {
-    position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(100px);
-    background:var(--surface); border:1px solid var(--border); border-radius:14px;
-    padding:13px 20px; font-size:13px; font-weight:700;
+    position:fixed; bottom:28px; left:50%;
+    transform:translateX(-50%) translateY(120px);
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:14px; padding:12px 20px;
+    font-size:13px; font-weight:700;
     box-shadow:0 8px 32px rgba(0,0,0,.6);
     transition:transform .4s cubic-bezier(.34,1.56,.64,1);
-    z-index:999; white-space:nowrap; display:flex; align-items:center; gap:8px;
+    z-index:999; display:flex; align-items:center; gap:8px;
+    max-width:320px; text-align:center;
   }
   .toast.show { transform:translateX(-50%) translateY(0); }
-  .toast.success { border-color:var(--accent-in); color:var(--accent-in); }
-  .toast.error   { border-color:var(--accent-out); color:var(--accent-out); }
-  .toast.warning { border-color:var(--accent-warn); color:var(--accent-warn); }
+  .toast.ok   { border-color:var(--green); color:var(--green); }
+  .toast.err  { border-color:var(--red);   color:var(--red);   }
+  .toast.warn { border-color:var(--yellow);color:var(--yellow);}
 
   ::-webkit-scrollbar { width:3px; }
   ::-webkit-scrollbar-thumb { background:var(--border); border-radius:4px; }
@@ -231,27 +215,29 @@
   </div>
 
   <!-- شاشة جهاز مرفوض -->
-  <div class="blocked" id="blockedScreen" style="display:none;">
-    <div class="blocked-icon">🚫</div>
+  <div class="alert-screen screen-blocked" id="screenBlocked">
+    <div class="icon">🚫</div>
     <h2>جهاز غير معرّف</h2>
     <p>هذا الجهاز غير مسجّل في النظام<br>ولا يملك صلاحية تسجيل الحضور.</p>
     <div class="contact">📞 تواصل مع بشمهندس نورالدين لتفعيل جهازك</div>
   </div>
 
-  <!-- شاشة جهاز في الانتظار -->
-  <div class="pending" id="pendingScreen" style="display:none;">
-    <div class="pending-icon">⏳</div>
+  <!-- شاشة جهاز معلق -->
+  <div class="alert-screen screen-pending" id="screenPending">
+    <div class="icon">⏳</div>
     <h2>جهازك قيد المراجعة</h2>
-    <p>تم إرسال طلب تفعيل جهازك للإدارة.<br>انتظر حتى يتم الموافقة عليه.</p>
+    <p>تم تسجيل جهازك وإرسال طلب التفعيل للإدارة.<br>انتظر حتى تتم الموافقة.</p>
+    <div class="contact">📞 تواصل مع بشمهندس نورالدين لتفعيل جهازك</div>
   </div>
 
   <!-- المحتوى الرئيسي -->
-  <div id="mainContent">
+  <div id="main">
 
+    <!-- الموظف -->
     <div class="card">
       <div class="card-title">بيانات الموظف</div>
-      <div class="select-wrap">
-        <select id="empSelect">
+      <div class="sel-wrap">
+        <select id="empSel">
           <option value="">— اختر اسمك —</option>
           <option>أم كامل</option>
           <option>أحمد الحسيني</option>
@@ -276,8 +262,9 @@
       </div>
     </div>
 
+    <!-- الوظيفة -->
     <div class="card">
-      <div class="card-title">الوظيفة اليوم (اختر واحدة أو أكثر)</div>
+      <div class="card-title">الوظيفة اليوم (واحدة أو أكثر)</div>
       <div class="jobs-grid">
         <button class="job-btn" onclick="toggleJob(this)">ريسبشن</button>
         <button class="job-btn" onclick="toggleJob(this)">سحب عينات</button>
@@ -287,215 +274,265 @@
         <button class="job-btn" onclick="toggleJob(this)">عمال</button>
         <button class="job-btn" onclick="toggleJob(this)" style="grid-column:1/-1">تحديد الوظيفة</button>
       </div>
-      <div class="jobs-note" id="jobsNote">لم يتم اختيار وظيفة بعد</div>
+      <div class="jobs-note" id="jobNote">لم يتم اختيار وظيفة</div>
     </div>
 
+    <!-- الموقع -->
     <div class="card">
       <div class="card-title">الموقع الجغرافي</div>
-      <div class="loc-bar" id="locBar">
+      <div class="loc-row" id="locRow">
         <div class="dot"></div>
-        <div class="loc-text" id="locText">اضغط لتحديد موقعك</div>
+        <div class="loc-txt" id="locTxt">اضغط لتحديد موقعك</div>
       </div>
-      <button class="btn-loc" onclick="getLocation()">📍 تحديد الموقع</button>
+      <button class="btn btn-loc" onclick="getLocation()">📍 تحديد الموقع</button>
     </div>
 
+    <!-- تسجيل -->
     <div class="card">
       <div class="card-title">تسجيل الحضور / الانصراف</div>
       <div class="btn-row">
-        <button class="btn btn-in"  id="btnIn"  onclick="submit('حضور')"   disabled>✅ حضور</button>
-        <button class="btn btn-out" id="btnOut" onclick="submit('انصراف')" disabled>🚪 انصراف</button>
+        <button class="btn btn-in"  id="btnIn"  onclick="doSubmit('حضور')"   disabled>✅ حضور</button>
+        <button class="btn btn-out" id="btnOut" onclick="doSubmit('انصراف')" disabled>🚪 انصراف</button>
       </div>
     </div>
 
+    <!-- سجل اليوم -->
     <div class="card">
       <div class="card-title">سجل اليوم</div>
-      <div class="hist-list" id="histList">
-        <div class="empty">لا توجد سجلات بعد</div>
-      </div>
+      <div class="hist" id="histList"><div class="empty">لا توجد سجلات بعد</div></div>
     </div>
 
-  </div>
-</div>
+  </div><!-- /main -->
+</div><!-- /wrap -->
 
 <div class="toast" id="toast">
-  <span id="toastIcon"></span>
-  <span id="toastMsg"></span>
+  <span id="tIcon"></span>
+  <span id="tMsg"></span>
 </div>
 
 <script>
-/* ============================================================
-   ⚙️ إعدادات — عدّل هنا بس
-   ============================================================ */
-const CONFIG = {
-  APPS_SCRIPT_URL: "https://script.google.com/macros/s/AKfycbzB2B8DptaDfWOXpYp34kLLQ7mVcTaSr5Kswy3DH8s/dev",
-  LAB_LAT: 30.8538325,
-  LAB_LON: 32.307204,
-  GEOFENCE_RADIUS: 9999999,
-};
-/* ============================================================ */
+// ============================================================
+// ✏️ عدّل هنا بس
+// ============================================================
+var SCRIPT_URL    = "https://script.google.com/macros/s/AKfycbwSHeT3nAVe_ogqquqdMX64i0CM2OwhUVWzfNYdiG9zrCQ5YzCbY7GTBG2qp6jHm2Xy/exec";
+var LAB_LAT       = 30.8538325;
+var LAB_LON       = 32.307204;
+var GEOFENCE      = 999999;   // ✏️ غيّره لـ 50 في المعمل
+// ============================================================
 
-let uuid = "", lat = null, lon = null, locationOK = false;
-let selectedJobs = [];
+var uuid       = "";
+var lat        = null;
+var lon        = null;
+var locOK      = false;
+var selJobs    = [];
 
-window.onload = () => {
+// -------- INIT --------
+window.onload = function() {
   startClock();
-  initDevice();
-  loadHistory();
+  initUUID();
+  loadHist();
 };
 
+// -------- CLOCK --------
 function startClock() {
-  const tick = () => {
-    const n = new Date();
-    document.getElementById("clock").textContent = n.toLocaleTimeString("ar-EG", {hour12:false});
-    document.getElementById("dateStr").textContent = n.toLocaleDateString("ar-EG", {weekday:"long",year:"numeric",month:"long",day:"numeric"});
-  };
-  tick(); setInterval(tick, 1000);
+  function tick() {
+    var n = new Date();
+    document.getElementById("clock").textContent   = n.toLocaleTimeString("ar-EG",{hour12:false});
+    document.getElementById("dateStr").textContent = n.toLocaleDateString("ar-EG",{weekday:"long",year:"numeric",month:"long",day:"numeric"});
+  }
+  tick();
+  setInterval(tick, 1000);
 }
 
-function initDevice() {
-  let stored = localStorage.getItem("att_uuid");
+// -------- UUID --------
+function initUUID() {
+  var stored = localStorage.getItem("att_uuid");
   if (!stored) {
-    stored = (crypto.randomUUID ? crypto.randomUUID() : generateUUID());
+    stored = typeof crypto.randomUUID === "function"
+      ? crypto.randomUUID()
+      : "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function(c){
+          var r = Math.random()*16|0;
+          return (c==="x"?r:(r&0x3|0x8)).toString(16);
+        });
     localStorage.setItem("att_uuid", stored);
   }
   uuid = stored;
 }
 
-function generateUUID() {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
-    const r = Math.random()*16|0;
-    return (c==='x'?r:(r&0x3|0x8)).toString(16);
-  });
-}
-
+// -------- JOBS --------
 function toggleJob(btn) {
-  btn.classList.toggle("selected");
-  selectedJobs = [...document.querySelectorAll(".job-btn.selected")].map(b => b.textContent.replace("✓ ",""));
-  const note = document.getElementById("jobsNote");
-  note.textContent = selectedJobs.length ? "✅ " + selectedJobs.join(" + ") : "لم يتم اختيار وظيفة بعد";
+  btn.classList.toggle("on");
+  selJobs = Array.from(document.querySelectorAll(".job-btn.on"))
+                 .map(function(b){ return b.textContent.replace("✓ ",""); });
+  document.getElementById("jobNote").textContent =
+    selJobs.length ? "✅ " + selJobs.join(" + ") : "لم يتم اختيار وظيفة";
 }
 
+// -------- GPS --------
 function getLocation() {
-  const bar = document.getElementById("locBar");
-  const txt = document.getElementById("locText");
+  var row = document.getElementById("locRow");
+  var txt = document.getElementById("locTxt");
+  row.className = "loc-row";
   txt.textContent = "جارٍ تحديد الموقع…";
-  bar.className = "loc-bar";
 
-  if (!navigator.geolocation) { showToast("GPS غير مدعوم", "error"); return; }
+  if (!navigator.geolocation) { toast("GPS غير مدعوم","err"); return; }
 
-  navigator.geolocation.getCurrentPosition(pos => {
-    lat = pos.coords.latitude;
-    lon = pos.coords.longitude;
-    const acc = pos.coords.accuracy;
+  navigator.geolocation.getCurrentPosition(
+    function(pos) {
+      lat = pos.coords.latitude;
+      lon = pos.coords.longitude;
+      var acc  = pos.coords.accuracy;
+      var dist = haversine(lat, lon, LAB_LAT, LAB_LON);
 
-    if (acc > 500) {
-      bar.className = "loc-bar fail";
-      txt.textContent = "⚠️ موقع غير موثوق — دقة ضعيفة جداً";
-      showToast("الموقع غير موثوق", "warning");
-      return;
-    }
+      if (acc > 500) {
+        row.className = "loc-row warn";
+        txt.textContent = "⚠️ موقع غير موثوق — دقة ضعيفة";
+        toast("الموقع غير موثوق","warn");
+        return;
+      }
 
-    const dist = haversine(lat, lon, CONFIG.LAB_LAT, CONFIG.LAB_LON);
-    locationOK = dist <= CONFIG.GEOFENCE_RADIUS;
-
-    if (locationOK) {
-      bar.className = "loc-bar ok";
-      txt.textContent = `✅ داخل النطاق — ${Math.round(dist)} متر`;
-      enableBtns(true);
-      showToast("تم تأكيد موقعك ✅", "success");
-    } else {
-      bar.className = "loc-bar fail";
-      txt.textContent = `❌ خارج النطاق — ${Math.round(dist)} متر`;
-      enableBtns(false);
-      showToast(`أنت خارج النطاق بـ ${Math.round(dist)} متر`, "error");
-    }
-  }, () => {
-    bar.className = "loc-bar fail";
-    txt.textContent = "فشل تحديد الموقع — تأكد من إذن GPS";
-    showToast("فشل تحديد الموقع", "error");
-  }, {enableHighAccuracy:true, timeout:10000});
+      locOK = dist <= GEOFENCE;
+      if (locOK) {
+        row.className = "loc-row ok";
+        txt.textContent = "✅ داخل النطاق — " + Math.round(dist) + " متر";
+        setBtns(true);
+        toast("تم تأكيد موقعك ✅","ok");
+      } else {
+        row.className = "loc-row fail";
+        txt.textContent = "❌ خارج النطاق — " + Math.round(dist) + " متر";
+        setBtns(false);
+        toast("أنت خارج نطاق المعمل","err");
+      }
+    },
+    function() {
+      row.className = "loc-row fail";
+      txt.textContent = "فشل تحديد الموقع — تأكد من إذن GPS";
+      toast("فشل تحديد الموقع","err");
+    },
+    { enableHighAccuracy:true, timeout:10000 }
+  );
 }
 
-function haversine(la1,lo1,la2,lo2) {
-  const R=6371000, dL=(la2-la1)*Math.PI/180, dO=(lo2-lo1)*Math.PI/180;
-  const a=Math.sin(dL/2)**2+Math.cos(la1*Math.PI/180)*Math.cos(la2*Math.PI/180)*Math.sin(dO/2)**2;
-  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
-}
-
-function enableBtns(v) {
+function setBtns(v) {
   document.getElementById("btnIn").disabled  = !v;
   document.getElementById("btnOut").disabled = !v;
 }
 
-async function submit(type) {
-  const name = document.getElementById("empSelect").value.trim();
-  if (!name)             { showToast("اختار اسمك أولاً", "warning"); return; }
-  if (!locationOK)       { showToast("حدد موقعك أولاً", "warning"); return; }
-  if (!selectedJobs.length) { showToast("اختار وظيفتك اليوم", "warning"); return; }
+// -------- SUBMIT --------
+function doSubmit(type) {
+  var name = document.getElementById("empSel").value.trim();
+  if (!name)          { toast("اختار اسمك أولاً","warn"); return; }
+  if (!locOK)         { toast("حدد موقعك أولاً","warn"); return; }
+  if (!selJobs.length){ toast("اختار وظيفتك اليوم","warn"); return; }
 
-  const btnId = type==="حضور"?"btnIn":"btnOut";
-  const btn = document.getElementById(btnId);
-  const orig = btn.innerHTML;
-  btn.disabled = true;
-  btn.innerHTML = `جارٍ الإرسال <span class="spinner"></span>`;
+  var btnId = type === "حضور" ? "btnIn" : "btnOut";
+  var btn   = document.getElementById(btnId);
+  var orig  = btn.innerHTML;
+  btn.disabled  = true;
+  btn.innerHTML = "جارٍ الإرسال <span class='spin'></span>";
 
-  const payload = {
-    name, type, uuid, lat, lon,
-    jobs: selectedJobs.join(" + "),
-    timestamp: new Date().toISOString(),
+  var payload = {
+    name: name,
+    type: type,
+    uuid: uuid,
+    lat:  lat,
+    lon:  lon,
+    jobs: selJobs.join(" + "),
+    timestamp: new Date().toISOString()
   };
 
-  try {
-    await fetch(CONFIG.APPS_SCRIPT_URL, {
-      method: "POST",
-      headers: {"Content-Type":"application/json"},
-      body: JSON.stringify(payload),
-      mode: "no-cors",
-    });
-    showToast(`تم تسجيل ${type} ✅`, "success");
-    addHistory(name, type, selectedJobs.join(" + "), new Date());
-  } catch(e) {
-    showToast("خطأ في الإرسال", "error");
-  } finally {
+  var xhr = new XMLHttpRequest();
+  xhr.open("POST", SCRIPT_URL, true);
+  xhr.setRequestHeader("Content-Type", "text/plain");
+
+  xhr.onload = function() {
     btn.innerHTML = orig;
-    btn.disabled = false;
+    btn.disabled  = false;
+
+    try {
+      var res = JSON.parse(xhr.responseText);
+      handleResponse(res, name, type);
+    } catch(e) {
+      // Apps Script أحياناً بيرجع redirect — نعتبره نجاح
+      toast("تم الإرسال ✅","ok");
+      addHist(name, type, selJobs.join(" + "), new Date());
+    }
+  };
+
+  xhr.onerror = function() {
+    btn.innerHTML = orig;
+    btn.disabled  = false;
+    toast("خطأ في الاتصال — تحقق من الإنترنت","err");
+  };
+
+  xhr.send(JSON.stringify(payload));
+}
+
+function handleResponse(res, name, type) {
+  if (res.status === "success") {
+    toast(res.message || "تم التسجيل ✅","ok");
+    addHist(name, type, selJobs.join(" + "), new Date());
+
+  } else if (res.status === "pending") {
+    document.getElementById("main").style.display          = "none";
+    document.getElementById("screenPending").style.display = "block";
+
+  } else if (res.status === "blocked") {
+    document.getElementById("main").style.display          = "none";
+    document.getElementById("screenBlocked").style.display = "block";
+
+  } else if (res.status === "rejected") {
+    toast(res.message || "تم الرفض","err");
+
+  } else {
+    toast(res.message || "خطأ غير معروف","err");
   }
 }
 
-function addHistory(name, type, jobs, d) {
-  const k = "att_hist_" + new Date().toDateString();
-  const h = JSON.parse(localStorage.getItem(k)||"[]");
-  h.unshift({name, type, jobs, time: d.toLocaleTimeString("ar-EG",{hour12:false})});
+// -------- HISTORY --------
+function addHist(name, type, jobs, d) {
+  var k = "att_h_" + new Date().toDateString();
+  var h = JSON.parse(localStorage.getItem(k) || "[]");
+  h.unshift({ name:name, type:type, jobs:jobs, time:d.toLocaleTimeString("ar-EG",{hour12:false}) });
   localStorage.setItem(k, JSON.stringify(h.slice(0,20)));
-  renderHistory(h);
+  renderHist(h);
 }
 
-function loadHistory() {
-  const k = "att_hist_" + new Date().toDateString();
-  renderHistory(JSON.parse(localStorage.getItem(k)||"[]"));
+function loadHist() {
+  var k = "att_h_" + new Date().toDateString();
+  renderHist(JSON.parse(localStorage.getItem(k) || "[]"));
 }
 
-function renderHistory(h) {
-  const el = document.getElementById("histList");
-  if (!h.length) { el.innerHTML='<div class="empty">لا توجد سجلات اليوم</div>'; return; }
-  el.innerHTML = h.map(r=>`
-    <div class="hist-item">
-      <span style="font-weight:700">${r.name}</span>
-      <span style="font-size:11px;color:var(--text-muted)">${r.jobs||""}</span>
-      <span class="badge ${r.type==='حضور'?'badge-in':'badge-out'}">${r.type}</span>
-      <span style="color:var(--text-muted);font-size:11px">${r.time}</span>
-    </div>`).join("");
+function renderHist(h) {
+  var el = document.getElementById("histList");
+  if (!h.length) { el.innerHTML = '<div class="empty">لا توجد سجلات اليوم</div>'; return; }
+  el.innerHTML = h.map(function(r){
+    return '<div class="hist-row">' +
+      '<span style="font-weight:700">' + r.name + '</span>' +
+      '<span style="font-size:11px;color:var(--muted)">' + (r.jobs||"") + '</span>' +
+      '<span class="badge ' + (r.type==="حضور"?"b-in":"b-out") + '">' + r.type + '</span>' +
+      '<span style="color:var(--muted);font-size:11px">' + r.time + '</span>' +
+      '</div>';
+  }).join("");
 }
 
-let tt;
-function showToast(msg, type="success") {
-  const icons={success:"✅",error:"❌",warning:"⚠️"};
-  const t=document.getElementById("toast");
-  document.getElementById("toastMsg").textContent=msg;
-  document.getElementById("toastIcon").textContent=icons[type]||"ℹ️";
-  t.className=`toast ${type} show`;
-  clearTimeout(tt);
-  tt=setTimeout(()=>t.className=`toast ${type}`,3500);
+// -------- HAVERSINE --------
+function haversine(la1,lo1,la2,lo2) {
+  var R=6371000, dL=(la2-la1)*Math.PI/180, dO=(lo2-lo1)*Math.PI/180;
+  var a=Math.sin(dL/2)*Math.sin(dL/2)+Math.cos(la1*Math.PI/180)*Math.cos(la2*Math.PI/180)*Math.sin(dO/2)*Math.sin(dO/2);
+  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+}
+
+// -------- TOAST --------
+var tTimer;
+function toast(msg, type) {
+  var icons = { ok:"✅", err:"❌", warn:"⚠️" };
+  var el = document.getElementById("toast");
+  document.getElementById("tMsg").textContent  = msg;
+  document.getElementById("tIcon").textContent = icons[type] || "ℹ️";
+  el.className = "toast " + type + " show";
+  clearTimeout(tTimer);
+  tTimer = setTimeout(function(){ el.className = "toast " + type; }, 4000);
 }
 </script>
 </body>
