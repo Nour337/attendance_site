@@ -196,6 +196,37 @@
   .toast.err  { border-color:var(--red);   color:var(--red);   }
   .toast.warn { border-color:var(--yellow);color:var(--yellow);}
 
+  /* STATUS LINE */
+  .shift-status {
+    font-size:12px; color:var(--muted); text-align:center;
+    margin-top:10px; line-height:1.7; min-height:20px;
+  }
+  .shift-status b { color:var(--text); }
+
+  /* MODAL */
+  .modal-bg {
+    position:fixed; inset:0; background:rgba(2,6,16,.78);
+    display:none; align-items:center; justify-content:center;
+    z-index:1000; padding:16px;
+  }
+  .modal-bg.show { display:flex; }
+  .modal {
+    width:100%; max-width:400px; background:var(--surface);
+    border:1px solid var(--border); border-radius:18px;
+    padding:24px 20px; text-align:center;
+    box-shadow:0 12px 48px rgba(0,0,0,.6);
+  }
+  .modal .m-icon { font-size:46px; margin-bottom:10px; }
+  .modal .m-text { font-size:15px; line-height:1.9; white-space:pre-line; font-weight:600; }
+  .modal.warn { border-color:#92400e; }
+  .modal.warn .m-text { color:#fde68a; }
+  .modal.done { border-color:#065f46; }
+  .modal.done .m-text { color:#a7f3d0; }
+  .m-btns { display:flex; flex-direction:column; gap:8px; margin-top:18px; }
+  .m-btn { width:100%; padding:13px; font-size:15px; }
+  .m-primary { background:linear-gradient(135deg,#10b981,#059669); color:#022c22; }
+  .m-danger  { background:transparent; border:1px solid #7f1d1d !important; color:#fca5a5; }
+
   ::-webkit-scrollbar { width:3px; }
   ::-webkit-scrollbar-thumb { background:var(--border); border-radius:4px; }
 </style>
@@ -298,6 +329,7 @@
         <button class="btn btn-in"  id="btnIn"  onclick="doSubmit('حضور')"   disabled>✅ حضور</button>
         <button class="btn btn-out" id="btnOut" onclick="doSubmit('انصراف')" disabled>🚪 انصراف</button>
       </div>
+      <div class="shift-status" id="shiftStatus"></div>
     </div>
 
     <!-- سجل اليوم -->
@@ -308,6 +340,15 @@
 
   </div><!-- /main -->
 </div><!-- /wrap -->
+
+<!-- نافذة التنبيهات -->
+<div class="modal-bg" id="modalBg">
+  <div class="modal" id="modalBox">
+    <div class="m-icon" id="mIcon"></div>
+    <div class="m-text" id="mText"></div>
+    <div class="m-btns" id="mBtns"></div>
+  </div>
+</div>
 
 <div class="toast" id="toast">
   <span id="tIcon"></span>
@@ -322,9 +363,14 @@ var SCRIPT_URL    = "https://script.google.com/macros/s/AKfycbwaCzd0Wls5zWk9Flcx
 var LAB_LAT       = 30.8538325;
 var LAB_LON       = 32.307204;
 var GEOFENCE      = 1000;   // ✏️ غيّره لـ 50 في المعمل
+var SHIFT_HOURS        = 7;    // مدة الشيفت العادي
+var FRIDAY_SHIFT_HOURS = 6;    // مدة شيفت يوم الجمعة
+var EARLY_WARN_MIN     = 15;   // تحذير لو فاضل أقل من كده على نهاية الشيفت
+var MAX_OPEN_HOURS     = 16;   // بعدها الحضور القديم يعتبر منسي ومسموح بحضور جديد
 // ============================================================
 
 var uuid       = "";
+var reminderTimer = null;
 var lat        = null;
 var lon        = null;
 var locOK      = false;
@@ -335,6 +381,12 @@ window.onload = function() {
   startClock();
   initUUID();
   loadHist();
+  document.getElementById("empSel").addEventListener("change", function(){
+    refreshShiftUI();
+    scheduleReminder();
+  });
+  refreshShiftUI();
+  scheduleReminder();
 };
 
 // -------- CLOCK --------
@@ -420,6 +472,146 @@ function getLocation() {
 function setBtns(v) {
   document.getElementById("btnIn").disabled  = !v;
   document.getElementById("btnOut").disabled = !v;
+  if (v) {
+    // اطلب إذن الإشعارات علشان تذكير نهاية الشيفت (مرة واحدة)
+    try {
+      if ("Notification" in window && Notification.permission === "default") Notification.requestPermission();
+    } catch(e) {}
+  }
+}
+
+// ============================================================
+// -------- SHIFT STATE (آخر تسجيل لكل موظف على الجهاز) --------
+// ============================================================
+function getState(name) {
+  try { return JSON.parse(localStorage.getItem("att_state_" + name) || "null"); }
+  catch(e) { return null; }
+}
+function setState(name, type, t) {
+  try { localStorage.setItem("att_state_" + name, JSON.stringify({ type:type, time:t })); } catch(e) {}
+}
+
+// حضور مفتوح = آخر تسجيل حضور ومعداش عليه MAX_OPEN_HOURS
+function openShift(name) {
+  var s = getState(name);
+  if (!s || s.type !== "حضور") return null;
+  if (Date.now() - s.time > MAX_OPEN_HOURS * 3600000) return null;
+  return s;
+}
+
+function shiftMs(checkInTime) {
+  var isFriday = new Date(checkInTime).getDay() === 5;
+  return (isFriday ? FRIDAY_SHIFT_HOURS : SHIFT_HOURS) * 3600000;
+}
+
+function fmtTime(t) {
+  return new Date(t).toLocaleTimeString("ar-EG", { hour:"numeric", minute:"2-digit" });
+}
+
+function refreshShiftUI() {
+  var el   = document.getElementById("shiftStatus");
+  var name = document.getElementById("empSel").value.trim();
+  if (!name) { el.innerHTML = ""; return; }
+  var s = getState(name);
+  var o = openShift(name);
+  if (o) {
+    var end = o.time + shiftMs(o.time);
+    el.innerHTML = "🟢 مسجّل حضور من <b>" + fmtTime(o.time) + "</b> — نهاية الشيفت <b>" + fmtTime(end) + "</b>";
+  } else if (s && s.type === "انصراف") {
+    el.innerHTML = "⚪ آخر تسجيل: انصراف <b>" + fmtTime(s.time) + "</b>";
+  } else {
+    el.innerHTML = "";
+  }
+}
+
+// -------- قواعد التسجيل --------
+// يرجّع رسالة خطأ لو التسجيل ممنوع، أو null لو مسموح
+function ruleError(name, type) {
+  var s = getState(name);
+  if (type === "حضور") {
+    if (openShift(name))
+      return "أنت مسجّل حضور بالفعل الساعة " + fmtTime(s.time) + "\nلازم تسجّل انصراف الأول قبل حضور جديد.";
+  } else {
+    if (s && s.type === "انصراف")
+      return "أنت مسجّل انصراف بالفعل الساعة " + fmtTime(s.time) + "\nلازم تسجّل حضور الأول.";
+  }
+  return null;
+}
+
+// -------- تذكير بعد انتهاء الشيفت --------
+function doneMsg() {
+  var h = SHIFT_HOURS;
+  return "تم إتمام شيفتك الـ" + h + " ساعات 👏\n" +
+         "شكرًا لمجهودك يا دكتور ❤️\n" +
+         "إذا انتهيت من العمل، يرجى تسجيل الانصراف الآن.\n" +
+         "وفي حالة الاستمرار، سجّل الانصراف عند الانتهاء.";
+}
+function doneMsgFor(checkIn) {
+  var h = Math.round(shiftMs(checkIn) / 3600000);
+  return doneMsg().replace("الـ" + SHIFT_HOURS + " ساعات", "الـ" + h + " ساعات");
+}
+
+function scheduleReminder() {
+  clearTimeout(reminderTimer);
+  // كل الموظفين اللي ليهم حضور مفتوح على الجهاز ده
+  var soonest = null;
+  for (var i = 0; i < localStorage.length; i++) {
+    var k = localStorage.key(i);
+    if (!k || k.indexOf("att_state_") !== 0) continue;
+    var name = k.slice(10);
+    var o = openShift(name);
+    if (!o) continue;
+    var end = o.time + shiftMs(o.time);
+    var remKey = "att_rem_" + name + "_" + o.time;
+    if (localStorage.getItem(remKey)) continue;
+    if (Date.now() >= end) { fireReminder(name, o, remKey); return; }
+    if (soonest === null || end < soonest) soonest = end;
+  }
+  if (soonest !== null) {
+    reminderTimer = setTimeout(scheduleReminder, Math.min(soonest - Date.now() + 1000, 2147000000));
+  }
+}
+
+function fireReminder(name, o, remKey) {
+  try { localStorage.setItem(remKey, "1"); } catch(e) {}
+  var msg = doneMsgFor(o.time);
+  // إشعار على الموبايل لو الإذن متاح
+  try {
+    if ("Notification" in window && Notification.permission === "granted") {
+      if (navigator.serviceWorker && navigator.serviceWorker.ready) {
+        navigator.serviceWorker.getRegistration().then(function(reg){
+          if (reg) reg.showNotification("معمل النور — " + name, { body: msg });
+          else new Notification("معمل النور — " + name, { body: msg });
+        });
+      } else {
+        new Notification("معمل النور — " + name, { body: msg });
+      }
+    }
+  } catch(e) {}
+  try { navigator.vibrate && navigator.vibrate([200,100,200]); } catch(e) {}
+  showModal("done", "👏", name + "\n\n" + msg, [
+    { label:"تمام", cls:"m-primary", fn:function(){ scheduleReminder(); } }
+  ]);
+}
+
+// -------- MODAL --------
+function showModal(kind, icon, text, buttons) {
+  document.getElementById("modalBox").className = "modal " + kind;
+  document.getElementById("mIcon").textContent = icon;
+  document.getElementById("mText").textContent = text;
+  var box = document.getElementById("mBtns");
+  box.innerHTML = "";
+  buttons.forEach(function(b){
+    var el = document.createElement("button");
+    el.className = "btn m-btn " + b.cls;
+    el.textContent = b.label;
+    el.onclick = function(){ hideModal(); if (b.fn) b.fn(); };
+    box.appendChild(el);
+  });
+  document.getElementById("modalBg").className = "modal-bg show";
+}
+function hideModal() {
+  document.getElementById("modalBg").className = "modal-bg";
 }
 
 // -------- SUBMIT --------
@@ -428,6 +620,36 @@ function doSubmit(type) {
   if (!name)          { toast("اختار اسمك أولاً","warn"); return; }
   if (!locOK)         { toast("حدد موقعك أولاً","warn"); return; }
   if (!selJobs.length){ toast("اختار وظيفتك اليوم","warn"); return; }
+
+  // 1) منع الحضور مرتين / الانصراف مرتين
+  var err = ruleError(name, type);
+  if (err) {
+    showModal("warn", "⛔", err, [{ label:"حسنًا", cls:"m-primary" }]);
+    return;
+  }
+
+  // 2) تحذير الانصراف قبل نهاية الشيفت بأقل من ربع ساعة
+  if (type === "انصراف") {
+    var o = openShift(name);
+    if (o) {
+      var remainingMin = Math.ceil((o.time + shiftMs(o.time) - Date.now()) / 60000);
+      if (remainingMin > 0 && remainingMin <= EARLY_WARN_MIN) {
+        showModal("warn", "⏳",
+          "لسه فاضلك أقل من " + remainingMin + " دقيقة على إتمام شيفتك\n" +
+          "برجاء عدم تسجيل الانصراف الآن، وبصم بعد إتمام الشيفت.",
+          [
+            { label:"تمام، هستنى", cls:"m-primary" },
+            { label:"سجّل انصراف على أي حال", cls:"m-danger", fn:function(){ sendAttendance(name, type); } }
+          ]);
+        return;
+      }
+    }
+  }
+
+  sendAttendance(name, type);
+}
+
+function sendAttendance(name, type) {
 
   var btnId = type === "حضور" ? "btnIn" : "btnOut";
   var btn   = document.getElementById(btnId);
@@ -460,6 +682,7 @@ function doSubmit(type) {
       // Apps Script أحياناً بيرجع redirect — نعتبره نجاح
       toast("تم الإرسال ✅","ok");
       addHist(name, type, selJobs.join(" + "), new Date());
+      onRecorded(name, type);
     }
   };
 
@@ -476,6 +699,7 @@ function handleResponse(res, name, type) {
   if (res.status === "success") {
     toast(res.message || "تم التسجيل ✅","ok");
     addHist(name, type, selJobs.join(" + "), new Date());
+    onRecorded(name, type);
 
   } else if (res.status === "pending") {
     document.getElementById("main").style.display          = "none";
@@ -491,6 +715,12 @@ function handleResponse(res, name, type) {
   } else {
     toast(res.message || "خطأ غير معروف","err");
   }
+}
+
+function onRecorded(name, type) {
+  setState(name, type, Date.now());
+  refreshShiftUI();
+  scheduleReminder();
 }
 
 // -------- HISTORY --------
