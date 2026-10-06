@@ -367,10 +367,13 @@ var SHIFT_HOURS        = 7;    // مدة الشيفت العادي
 var FRIDAY_SHIFT_HOURS = 6;    // مدة شيفت يوم الجمعة
 var EARLY_WARN_MIN     = 15;   // تحذير لو فاضل أقل من كده على نهاية الشيفت
 var MAX_OPEN_HOURS     = 16;   // بعدها الحضور القديم يعتبر منسي ومسموح بحضور جديد
+var LOC_VALID_MIN      = 5;    // تأكيد الموقع صالح كام دقيقة قبل ما يتطلب تاني
 // ============================================================
 
 var uuid       = "";
 var reminderTimer = null;
+var locTime    = 0;      // وقت آخر تأكيد موقع
+var sending    = false;  // منع إرسال طلبين في نفس الوقت
 var lat        = null;
 var lon        = null;
 var locOK      = false;
@@ -387,6 +390,14 @@ window.onload = function() {
   });
   refreshShiftUI();
   scheduleReminder();
+  // لما الموظف يرجع للتطبيق: حدّث الحالة وشوف لو الشيفت خلص
+  document.addEventListener("visibilitychange", function(){
+    if (!document.hidden) { refreshShiftUI(); scheduleReminder(); }
+  });
+  // service worker مطلوب علشان الإشعارات تظهر على أندرويد
+  try {
+    if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(function(){});
+  } catch(e) {}
 };
 
 // -------- CLOCK --------
@@ -441,6 +452,8 @@ function getLocation() {
       var dist = haversine(lat, lon, LAB_LAT, LAB_LON);
 
       if (acc > 500) {
+        locOK = false;
+        setBtns(false);
         row.className = "loc-row warn";
         txt.textContent = "⚠️ موقع غير موثوق — دقة ضعيفة";
         toast("الموقع غير موثوق","warn");
@@ -448,6 +461,7 @@ function getLocation() {
       }
 
       locOK = dist <= GEOFENCE;
+      locTime = Date.now();
       if (locOK) {
         row.className = "loc-row ok";
         txt.textContent = "✅ داخل النطاق — " + Math.round(dist) + " متر";
@@ -461,6 +475,8 @@ function getLocation() {
       }
     },
     function() {
+      locOK = false;
+      setBtns(false);
       row.className = "loc-row fail";
       txt.textContent = "فشل تحديد الموقع — تأكد من إذن GPS";
       toast("فشل تحديد الموقع","err");
@@ -475,7 +491,10 @@ function setBtns(v) {
   if (v) {
     // اطلب إذن الإشعارات علشان تذكير نهاية الشيفت (مرة واحدة)
     try {
-      if ("Notification" in window && Notification.permission === "default") Notification.requestPermission();
+      if ("Notification" in window && Notification.permission === "default") {
+        var pr = Notification.requestPermission();
+        if (pr && pr.catch) pr.catch(function(){});
+      }
     } catch(e) {}
   }
 }
@@ -508,6 +527,20 @@ function fmtTime(t) {
   return new Date(t).toLocaleTimeString("ar-EG", { hour:"numeric", minute:"2-digit" });
 }
 
+// الوقت + اليوم: "النهارده 9:00 ص" / "امبارح 4:00 م" / "الأحد 4 أكتوبر 4:00 م"
+function fmtWhen(t) {
+  var d = new Date(t), now = new Date();
+  var d0 = new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+  var n0 = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+  var days = Math.round((n0 - d0) / 86400000);
+  var day;
+  if (days === 0)      day = "النهارده";
+  else if (days === 1) day = "امبارح";
+  else if (days === -1) day = "بكرة";
+  else day = d.toLocaleDateString("ar-EG", { weekday:"long", day:"numeric", month:"long" });
+  return day + " " + fmtTime(t);
+}
+
 function refreshShiftUI() {
   var el   = document.getElementById("shiftStatus");
   var name = document.getElementById("empSel").value.trim();
@@ -516,9 +549,9 @@ function refreshShiftUI() {
   var o = openShift(name);
   if (o) {
     var end = o.time + shiftMs(o.time);
-    el.innerHTML = "🟢 مسجّل حضور من <b>" + fmtTime(o.time) + "</b> — نهاية الشيفت <b>" + fmtTime(end) + "</b>";
+    el.innerHTML = "🟢 مسجّل حضور من <b>" + fmtWhen(o.time) + "</b><br>نهاية الشيفت <b>" + fmtWhen(end) + "</b>";
   } else if (s && s.type === "انصراف") {
-    el.innerHTML = "⚪ آخر تسجيل: انصراف <b>" + fmtTime(s.time) + "</b>";
+    el.innerHTML = "⚪ آخر تسجيل: انصراف <b>" + fmtWhen(s.time) + "</b>";
   } else {
     el.innerHTML = "";
   }
@@ -530,10 +563,10 @@ function ruleError(name, type) {
   var s = getState(name);
   if (type === "حضور") {
     if (openShift(name))
-      return "أنت مسجّل حضور بالفعل الساعة " + fmtTime(s.time) + "\nلازم تسجّل انصراف الأول قبل حضور جديد.";
+      return "أنت مسجّل حضور بالفعل " + fmtWhen(s.time) + "\nلازم تسجّل انصراف الأول قبل حضور جديد.";
   } else {
     if (s && s.type === "انصراف")
-      return "أنت مسجّل انصراف بالفعل الساعة " + fmtTime(s.time) + "\nلازم تسجّل حضور الأول.";
+      return "أنت مسجّل انصراف بالفعل " + fmtWhen(s.time) + "\nلازم تسجّل حضور الأول.";
   }
   return null;
 }
@@ -573,18 +606,25 @@ function scheduleReminder() {
 }
 
 function fireReminder(name, o, remKey) {
+  if (document.getElementById("modalBg").className.indexOf("show") !== -1) {
+    clearTimeout(reminderTimer);
+    reminderTimer = setTimeout(scheduleReminder, 5000);   // نستنى لما النافذة الحالية تتقفل
+    return;
+  }
   try { localStorage.setItem(remKey, "1"); } catch(e) {}
   var msg = doneMsgFor(o.time);
   // إشعار على الموبايل لو الإذن متاح
   try {
     if ("Notification" in window && Notification.permission === "granted") {
-      if (navigator.serviceWorker && navigator.serviceWorker.ready) {
+      var title = "معمل النور — " + name;
+      var opts  = { body: msg, tag: remKey, renotify: true };
+      var plain = function(){ try { new Notification(title, opts); } catch(e) {} };
+      if (navigator.serviceWorker && navigator.serviceWorker.getRegistration) {
         navigator.serviceWorker.getRegistration().then(function(reg){
-          if (reg) reg.showNotification("معمل النور — " + name, { body: msg });
-          else new Notification("معمل النور — " + name, { body: msg });
-        });
+          if (reg) reg.showNotification(title, opts).catch(plain); else plain();
+        }).catch(plain);
       } else {
-        new Notification("معمل النور — " + name, { body: msg });
+        plain();
       }
     }
   } catch(e) {}
@@ -620,6 +660,17 @@ function doSubmit(type) {
   if (!name)          { toast("اختار اسمك أولاً","warn"); return; }
   if (!locOK)         { toast("حدد موقعك أولاً","warn"); return; }
   if (!selJobs.length){ toast("اختار وظيفتك اليوم","warn"); return; }
+  if (sending)        { return; }
+
+  // الموقع لازم يكون متأكد منه من قريب (مش من ساعة وهو برا المعمل)
+  if (Date.now() - locTime > LOC_VALID_MIN * 60000) {
+    locOK = false;
+    setBtns(false);
+    document.getElementById("locRow").className = "loc-row warn";
+    document.getElementById("locTxt").textContent = "⚠️ تأكيد الموقع انتهى — اضغط تحديد الموقع تاني";
+    toast("حدد موقعك تاني","warn");
+    return;
+  }
 
   // 1) منع الحضور مرتين / الانصراف مرتين
   var err = ruleError(name, type);
@@ -650,6 +701,8 @@ function doSubmit(type) {
 }
 
 function sendAttendance(name, type) {
+  if (sending) return;
+  sending = true;
 
   var btnId = type === "حضور" ? "btnIn" : "btnOut";
   var btn   = document.getElementById(btnId);
@@ -672,6 +725,7 @@ function sendAttendance(name, type) {
   xhr.setRequestHeader("Content-Type", "text/plain");
 
   xhr.onload = function() {
+    sending = false;
     btn.innerHTML = orig;
     btn.disabled  = false;
 
@@ -687,11 +741,14 @@ function sendAttendance(name, type) {
   };
 
   xhr.onerror = function() {
+    sending = false;
     btn.innerHTML = orig;
     btn.disabled  = false;
     toast("خطأ في الاتصال — تحقق من الإنترنت","err");
   };
 
+  xhr.timeout   = 30000;
+  xhr.ontimeout = xhr.onerror;
   xhr.send(JSON.stringify(payload));
 }
 
